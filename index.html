@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ivan Handyman</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#0f0f14;color:#fff}
+    .wrap{max-width:520px;margin:0 auto;padding:16px}
+    .card{background:#1b1b22;border:1px solid #2a2a35;border-radius:16px;padding:16px;margin-top:12px}
+    h1{font-size:22px;margin:0 0 6px}
+    p{opacity:.9;margin:0 0 12px;line-height:1.35}
+    .btn{width:100%;padding:14px 12px;border-radius:14px;border:1px solid #3a3a48;background:#2a2a35;color:#fff;font-size:16px;margin:8px 0}
+    .btn:active{transform:scale(.99)}
+    .small{font-size:12px;opacity:.75;margin-top:10px}
+    .row{display:flex;gap:10px}
+    .row .btn{flex:1}
+    textarea,input{width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid #3a3a48;background:#121219;color:#fff;margin:8px 0;font-size:15px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Ivan Handyman</h1>
+      <p>Select a service and send a request. I’ll reply in chat with the exact quote.</p>
+
+      <div class="row">
+        <button class="btn" onclick="pick('Furniture Assembly')">Furniture Assembly</button>
+        <button class="btn" onclick="pick('TV Mounting')">TV Mounting</button>
+      </div>
+      <button class="btn" onclick="pick('Shelves Installation')">Shelves Installation</button>
+
+      <input id="address" placeholder="City / Address (optional)" />
+      <textarea id="details" rows="4" placeholder="Details (what needs to be done?)"></textarea>
+
+      <button class="btn" onclick="send()">Send request</button>
+      <div class="small" id="status"></div>
+    </div>
+
+    <div class="small">Tip: Prices can be added later (from $ / calculator / payment).</div>
+  </div>
+
+  <script>
+    let service = "";
+    function pick(s){
+      service = s;
+      document.getElementById('status').textContent = "Selected: " + s;
+    }
+
+    function send(){
+      const tg = window.Telegram && window.Telegram.WebApp;
+      const address = document.getElementById('address').value.trim();
+      const details = document.getElementById('details').value.trim();
+
+      if(!service){
+        document.getElementById('status').textContent = "Please select a service first.";
+        return;
+      }
+      if(details.length < 5){
+        document.getElementById('status').textContent = "Please add a few details.";
+        return;
+      }
+
+      const payload = { service, address, details, ts: new Date().toISOString() };
+
+      if(tg){
+        tg.sendData(JSON.stringify(payload));
+        tg.close();
+      } else {
+        document.getElementById('status').textContent =
+          "This page must be opened inside Telegram to send the request.";
+        console.log(payload);
+      }
+    }
+  </script>
+</body>
+</html>
